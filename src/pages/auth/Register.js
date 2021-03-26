@@ -29,6 +29,12 @@ const Register = () => {
       url: "http://localhost:3000/register/complete",
       handleCodeInApp: true,
     };
+    await auth.sendSignInLinkToEmail(email, config);
+    toast.success(
+      `Email is sent to ${email}. Click the link to complete your registration`
+    );
+    localStorage.setItem("emailForRegistration", email);
+    setEmail("");
   };
 
   return (
@@ -36,6 +42,7 @@ const Register = () => {
       <div className="row">
         <div className="col-md-6 offset-md-3">
           <h4>Register</h4>
+          <ToastContainer />
           {registerForm()}
         </div>
       </div>
