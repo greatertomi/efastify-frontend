@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth } from "../../firebase";
-import { toast} from "react-toastify";
-import {REDIRECT_URL} from '../../constants';
+import { toast } from "react-toastify";
+import { REGISTER_REDIRECT_URL } from "../../constants";
+import { useSelector } from "react-redux";
 
-const Register = () => {
+const Register = ({ history }) => {
   const [email, setEmail] = useState("");
+
+  const { user } = useSelector((state) => ({ ...state }));
+
+  useEffect(() => {
+    if (user && user.token) {
+      history.push("/");
+    }
+  }, [user]);
 
   const registerForm = () => {
     return (
@@ -27,7 +36,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const config = {
-      url: REDIRECT_URL,
+      url: REGISTER_REDIRECT_URL,
       handleCodeInApp: true,
     };
     await auth.sendSignInLinkToEmail(email, config);

@@ -1,31 +1,40 @@
-import React, { useState } from "react";
-import {Button} from 'antd';
-import {useDispatch} from 'react-redux';
-import {GoogleOutlined, MailOutlined} from '@ant-design/icons';
-import {auth, googleAuthProvider} from '../../firebase';
-import {toast} from 'react-toastify';
+import React, { useEffect, useState } from "react";
+import { Button } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
+import { auth, googleAuthProvider } from "../../firebase";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
-const Login = ({history}) => {
+const Login = ({ history }) => {
   const [email, setEmail] = useState("oluwalusijohn@gmail.com");
   const [password, setPassword] = useState("programmer");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+
+  const { user } = useSelector((state) => ({ ...state }));
+
+  useEffect(() => {
+    if (user && user.token) {
+      history.push("/");
+    }
+  }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const result = await auth.signInWithEmailAndPassword(email, password);
-      const {user} = result;
+      const { user } = result;
       const idTokenResult = await user.getIdTokenResult();
       dispatch({
-        type: 'LOGGED_IN_USER',
+        type: "LOGGED_IN_USER",
         payload: {
           email: user.email,
-          token: idTokenResult.token
-        }
+          token: idTokenResult.token,
+        },
       });
-      history.push('/');
+      history.push("/");
     } catch (err) {
       console.log(err);
       toast.error(err.message);
@@ -34,20 +43,23 @@ const Login = ({history}) => {
   };
 
   const googleLogin = async () => {
-    auth.signInWithPopup(googleAuthProvider).then(async (result) => {
-      const {user} = result;
-      const idTokenResult = await user.getIdTokenResult();
-      dispatch({
-        type: 'LOGGED_IN_USER',
-        payload: {
-          email: user.email,
-          token: idTokenResult.token
-        }
+    auth
+      .signInWithPopup(googleAuthProvider)
+      .then(async (result) => {
+        const { user } = result;
+        const idTokenResult = await user.getIdTokenResult();
+        dispatch({
+          type: "LOGGED_IN_USER",
+          payload: {
+            email: user.email,
+            token: idTokenResult.token,
+          },
+        });
+      })
+      .catch((err) => {
+        toast.error(err.message);
       });
-    }).catch((err) => {
-      toast.error(err.message);
-    })
-  }
+  };
 
   const loginForm = () => {
     return (
@@ -91,7 +103,7 @@ const Login = ({history}) => {
     <div className="container p-5">
       <div className="row">
         <div className="col-md-6 offset-md-3">
-          {loading ? <h4>Login</h4> : 'Loading...'}
+          {loading ? "Loading..." : <h4>Login</h4>}
           {loginForm()}
           <Button
             onClick={googleLogin}
@@ -104,6 +116,9 @@ const Login = ({history}) => {
           >
             Login With Google
           </Button>
+          <Link to="/forgot/password" className="float-right text-danger">
+            Forgot password
+          </Link>
         </div>
       </div>
     </div>
