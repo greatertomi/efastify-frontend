@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { auth } from "../../firebase";
 import { toast} from "react-toastify";
+import {REDIRECT_URL} from '../../constants';
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ const Register = () => {
           className="form-control"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          placeholder="Your email"
           autoFocus
         />
         <button type="submit" className="btn btn-raised mt-2">
@@ -25,7 +27,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const config = {
-      url: process.env.REACT_APP_REGISTER_REDIRECT_URL,
+      url: REDIRECT_URL,
       handleCodeInApp: true,
     };
     await auth.sendSignInLinkToEmail(email, config);
